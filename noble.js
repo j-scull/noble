@@ -27,27 +27,132 @@ function show(){
     
     
    
-    var y1 = selFrom.options[selFrom.selectedIndex].text;
-    var y2 = selTo.options[selTo.selectedIndex].text;
+    var sel1 = selFrom.options[selFrom.selectedIndex].text;
+    var sel2 = selTo.options[selTo.selectedIndex].text;
     var c = document.getElementById('content');
-    /*c.innerHTML += y1;
-    c.innerHTML += y2;*/
+    
     var yr;
-    var i = Number(selFrom.options[0].text);
+    var yd;
+    var year = Number(selFrom.options[0].text);
     var yLen = selFrom.options.length;
     var firstYear = Number(selFrom.options[yLen-1].text);
+    
+    var categories;
+    var radios = document.getElementsByName('categoryButton');
+    var radioVal;
    
-    for( i ; i >= firstYear; i --){
-        yr  = document.getElementsByClassName('y' + i);
-        if ( i > Number(y1) || i < Number(y2) ){
-            yr[0].style.display = 'none';
+    for( year ; year >= firstYear; year --){
+        yr  = document.getElementById('y' + year);
+        yd = document.getElementById('d' + year);
+        categories = document.getElementById('d' + year).children;
+        if ( year > Number(sel1) || year < Number(sel2) ){
+            yr.style.display = 'none';
+            yd.style.display = 'none';
+            for (var k = 0; k < categories.length; k ++){
+                categories[k].style.display = 'none';
+            }
         }else{
-            yr[0].style.display = 'block';
+            yr.style.display = 'block';
+            yd.style.display = 'block';
+            for (var r = 1; r < radios.length; r++){
+                radioVal = radios[r].value;
+                if (radios[0].checked){
+                    for (var i = 0; i < categories.length; i ++){
+                        if ( categories[i].className == radioVal){
+                            categories[i].style.display = 'block';
+                        }
+                    }
+                }else{
+                    if (radios[r].checked){
+                        for (var j = 0; j < categories.length; j ++){
+                            if ( categories[j].className == radioVal){
+                                categories[j].style.display = 'block';
+                            }else{
+                                if (categories[j].innerHTML != year){
+                                    categories[j].style.display = 'none';
+                                }
+                                
+                            }  
+                        }  
+                    }    
+                }
+            }
         }
+        
+        
+        
+        
+        
         
     }
     
+    /*
+    c.innerHTML += year;
+    var categories;
+    var radios = document.getElementsByName('categoryButton');
+    var radioVal;
     
+    for( year ; year >= firstYear; year --){
+        
+        categories = document.getElementById('d' + year).children;
+        
+        if ( year > Number(sel1) || year < Number(sel2) ){
+            for (var k = 0; k < categories.length; k ++){
+                categories[k].style.display = 'none';
+            }
+        }else{
+            for (var r = 1; r < radios.length; r++){
+                radioVal = radios[r].value;
+                if (radios[0].checked){
+                    for (var i = 0; i < categories.length; i ++){
+                        if ( categories[i].className == radioVal){
+                            categories[i].style.display = 'block';
+                        }
+                    }
+                }else{
+                    if (radios[r].checked){
+                        for (var j = 0; j < categories.length; j ++){
+                            if ( categories[j].className == radioVal){
+                                categories[j].style.display = 'block';
+                            }else{
+                                categories[j].style.display = 'none';
+                            }  
+                        }  
+                    }    
+                }
+            }
+        }
+    }
+        
+        */
+        
+        
+    /*Gotta fix that transition!!!!*/   
+    /*If output is nothing, then 'no information for selected prize'*/
+        
+        /*
+        for ( var cr = 0; cr < cat.length; cr ++){
+            
+            if ( cr < c1 || cr > c2){
+                cat[cr].style.display = 'none';
+            }else{
+                if (radios[0].checked){
+                    cat[cr].style.display = 'block';
+                }else{
+                    if (radios[r].checked){
+                     cat[cr].style.display = 'block';
+                    }
+                    else{
+                        cat[cr].style.display = 'none';
+                    }
+                }
+            }
+           
+        }
+        
+        */ 
+       
+ 
     
     
     
@@ -124,26 +229,32 @@ function getInfo(d){
 
     var prizes = d.prizes;
     var output = '';
-    var classList = [];
     var idList = [];
+    var classList = [];
     var yearSelect;
     var catSelect ='';
     for (var i = 0; i < prizes.length; i++){
         var year = prizes[i].year;
         var cat = prizes[i].category;
-        idList.push(cat + year);
-        if (classList.includes('y' + year) == false){
-            classList.push('y' + year);
-            output += '<h3 class="y' + year + '">' + year + '</h3>';
+        if (idList.includes('y' + year) == false){
+            idList.push('y' + year);
+            idList.push('d' + year);
+            if (i == 0){
+                output += '<div id="d' + year + '">'; 
+            }else{
+                output += '</div><div id="d' + year + '">'; 
+            }
+            output += '<h3 id="y' + year + '">' + year + '</h3>';
             yearSelect += '<option value="' + year + '">' + year + '</option>';
         }
         if (classList.includes(cat) == false){
             classList.push(cat);
-            catSelect += '<input type ="radio" name="category" value="' + cat + '">' + cat + '<br>';
+            catSelect += '<input type ="radio" name="categoryButton" value="' + cat + '">' + cat + '<br>';
         }
         output += '<h3 class="' + cat + '">' + cat + '</h3>';
 
         output += '<div id="' + cat + year + '">';
+        idList.push(cat + year);
         if (typeof prizes[i].overallMotivation !== 'undefined'){
             var oMotiv = 'The Noble Prize in ' + cat + ' ' + year + ' was awarded ' + prizes[i].overallMotivation + '.';
 
@@ -164,8 +275,8 @@ function getInfo(d){
             output += '<p id="' + id + '">' + name + '</p><p>' + lMotiv + '</p><p>Prize share: ' + share +'</p>';
         }
         output += '</div>';
-
     }
+    output += '</div>';
 
     var out = document.getElementById('content');
     out.innerHTML += output;
@@ -173,8 +284,8 @@ function getInfo(d){
     mx.innerHTML = yearSelect;
     var mn = document.getElementById('minYear');
     mn.innerHTML = yearSelect;
-    var menu = document.getElementById('radBtn');
-    menu.innerHTML += '<input type="radio" name="category" value="all">all categories<br>' + catSelect;
+    var menu = document.getElementById('radioBtn');
+    menu.innerHTML += '<input type="radio" name="categoryButton" value="all" checked>all categories<br>' + catSelect;
 
 
     /*
@@ -198,12 +309,4 @@ function getInfo(d){
 
 
 
-            
-
-
-
-
-
-
-
-
+        
